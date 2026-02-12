@@ -1,0 +1,42 @@
+{
+  "style": "Dark space pixel art — ciemne tlo kosmosu, neonowe akcenty na statkach, glow efekty na silnikach i pociskach",
+  "gridSize": "8x8 (renderowane w 30x30 grid czesci statku)",
+  "palette": {
+    "space-bg": "#001122",
+    "grid-line": "#112244",
+    "player-core": "#f44",
+    "player-engine": "#4f4",
+    "player-gun": "#44f",
+    "enemy-core": "#f84",
+    "enemy-engine": "#8f4",
+    "enemy-gun": "#48f",
+    "cargo": "#ee4",
+    "bullet-friendly": "#0ff",
+    "bullet-enemy": "#f44",
+    "explosion": "#fa0",
+    "hud-text": "#fff",
+    "hud-dim": "#777"
+  },
+  "categories": {
+    "player": {
+      "sprites": ["core", "engine", "engineActive", "gun", "cargo"],
+      "desc": "Czesci statku gracza — rdzen, silnik (aktywny/nieaktywny), dzialo, ladownia"
+    },
+    "enemies": {
+      "sprites": ["core", "engine", "gun", "cargo"],
+      "desc": "Czesci wroga — te same typy, inne kolory"
+    },
+    "effects": {
+      "sprites": ["bullet", "explosion", "flame", "sparks"],
+      "desc": "Pociski, wybuchy, plomienie silnikow, iskry przy trafieniu"
+    },
+    "items": {
+      "sprites": ["floatingCore", "floatingEngine", "floatingGun", "floatingCargo"],
+      "desc": "Dryfujace czesci do zebrania"
+    },
+    "ui": {
+      "sprites": ["indicator", "gridSlot"],
+      "desc": "Wskaznik wroga poza ekranem, siatka budowy statku"
+    }
+  }
+}

@@ -1,78 +1,78 @@
 # Space Combat — Game Design Prompt
 
-Tworzysz gre typu Space Combat na platforme ForkArcade. Gra uzywa multi-file architektury z silnikiem FA. To gra real-time z modularnymi statkami, fizyka lotu i per-part damage.
+You are creating a Space Combat game for the ForkArcade platform. The game uses a multi-file architecture with the FA engine. It's a real-time game with modular ships, flight physics and per-part damage.
 
-## Architektura plikow
+## File architecture
 
 ```
-forkarcade-sdk.js   — PLATFORMA: SDK (scoring, auth) (nie modyfikuj)
-fa-narrative.js     — PLATFORMA: modul narracji (nie modyfikuj)
-sprites.js          — generowany z _sprites.json (nie modyfikuj recznie)
-fa-engine.js        — ENGINE (z szablonu): game loop, event bus, state, registry (nie modyfikuj)
-fa-renderer.js      — ENGINE (z szablonu): canvas, layers, draw helpers (nie modyfikuj)
-fa-input.js         — ENGINE (z szablonu): keyboard/mouse, keybindings (nie modyfikuj)
-fa-audio.js         — ENGINE (z szablonu): Web Audio, dzwieki (nie modyfikuj)
-data.js             — DANE GRY: config, typy czesci, uklady statkow, dzwieki, narracja
-physics.js          — FIZYKA: wektory, ciag, masa, kolizje, connectivity BFS
-ship.js             — LOGIKA: tworzenie statkow, damage, detach, AI, ekrany
-render.js           — RENDERING: grid, statki, pociski, HUD, narracja
+forkarcade-sdk.js   — PLATFORM: SDK (scoring, auth) (do not modify)
+fa-narrative.js     — PLATFORM: narrative module (do not modify)
+sprites.js          — generated from _sprites.json (do not modify manually)
+fa-engine.js        — ENGINE (from template): game loop, event bus, state, registry (do not modify)
+fa-renderer.js      — ENGINE (from template): canvas, layers, draw helpers (do not modify)
+fa-input.js         — ENGINE (from template): keyboard/mouse, keybindings (do not modify)
+fa-audio.js         — ENGINE (from template): Web Audio, sounds (do not modify)
+data.js             — GAME DATA: config, part types, ship layouts, sounds, narrative
+physics.js          — PHYSICS: vectors, thrust, mass, collisions, connectivity BFS
+ship.js             — LOGIC: ship creation, damage, detach, AI, screens
+render.js           — RENDERING: grid, ships, bullets, HUD, narrative
 main.js             — ENTRY POINT: keybindings, game loop, ForkArcade integration
 ```
 
-**Modyfikujesz tylko: `data.js`, `physics.js`, `ship.js`, `render.js`, `main.js`.**
+**You only modify: `data.js`, `physics.js`, `ship.js`, `render.js`, `main.js`.**
 
-## Kluczowe mechaniki
+## Key mechanics
 
-### Modularny statek
-- Statek = zestaw czesci na siatce 30px
-- Typy: core (rdzen, 8 HP), engine (silnik, 3 HP), gun (dzialo, 2 HP), cargo (ladownia, 2 HP)
-- Czesc jest "podlaczona" = istnieje sciezka BFS przez sasiednie czesci do core (odleglosc < 40px)
-- Niepolaczone czesci: nie dzialaja, alpha 0.4, sa odczepiane
+### Modular ship
+- Ship = set of parts on a 30px grid
+- Types: core (8 HP), engine (3 HP), gun (2 HP), cargo (2 HP)
+- A part is "connected" = there exists a BFS path through adjacent parts to core (distance < 40px)
+- Disconnected parts: don't function, alpha 0.4, get detached
 
-### Fizyka lotu
-- Real-time: `FA.isHeld()` zamiast `FA.isAction()`
-- Ciag: kazdy silnik aplikuje sile w kierunku przodu statku
-- Torque: silnik poza srodkiem masy generuje obrot
-- Tarcie: `vel *= 0.98`, `angVel *= 0.9` per tick
-- Turbo: Shift = 1.8x mnoznik ciagu
-- Uklad koordynat: 0 = gora (przod statku = -Y w lokalnych)
+### Flight physics
+- Real-time: `FA.isHeld()` instead of `FA.isAction()`
+- Thrust: each engine applies force in the ship's forward direction
+- Torque: engine off center of mass generates rotation
+- Friction: `vel *= 0.98`, `angVel *= 0.9` per tick
+- Turbo: Shift = 1.8x thrust multiplier
+- Coordinate system: 0 = up (ship front = -Y in local coords)
 
 ### Per-part damage
-- Pociski trafiaja w konkretna czesc (radius 20px)
-- Czesc traci HP -> `entity:damaged` event + float "-1"
-- HP <= 0 = czesc odczepia sie i dryfuje jako floatingPart
-- Brak core = zniszczenie statku
+- Bullets hit a specific part (radius 20px)
+- Part loses HP -> `entity:damaged` event + float "-1"
+- HP <= 0 = part detaches and drifts as floatingPart
+- No core = ship destroyed
 
-### Zbieranie czesci
-- Odczepione czesci dryfuja z predkoscia i spinem
+### Part collection
+- Detached parts drift with velocity and spin
 - Proximity auto-pickup (radius 40px)
-- Czesc doczepia sie do najblizszego wolnego slotu na siatce
-- Zycie dryfujacej czesci: 900 tickow (~15 sekund)
+- Part attaches to the nearest free grid slot
+- Drifting part lifetime: 900 ticks (~15 seconds)
 
-### AI wrogow
-- Prosty targeting: oblicz kat do gracza, obroc sie, lec, strzelaj
-- `atan2(dx, -dy)` dla katu (0 = gora)
-- Strzelaj gdy wycelowany (< 0.3 rad) i blisko (< 400px)
-- Enemy cooldown 3x dluzszy niz gracza
+### Enemy AI
+- Simple targeting: calculate angle to player, rotate, fly, shoot
+- `atan2(dx, -dy)` for angle (0 = up)
+- Shoot when aimed (< 0.3 rad) and close (< 400px)
+- Enemy cooldown 3x longer than player's
 
-### Kamera
+### Camera
 - Ship-centric: `FA.camera.x = ship.x - canvasW/2`
-- Nieskonczona przestrzen (bez clampowania)
-- Grid tla przewija sie z paralaksa
+- Infinite space (no clamping)
+- Background grid scrolls with parallax
 
 ## Scoring
 ```
 score = (kills * 100) + (parts_collected * 25) + (damage_dealt * 2) + floor(survival_seconds)
 ```
 
-## Jak dodawac zawartosc (data.js)
+## Adding content (data.js)
 
-### Nowy typ czesci
+### New part type
 ```js
-FA.register('partTypes', 'shield', { name: 'Tarcza', mass: 8, maxHp: 5, char: 'S' });
+FA.register('partTypes', 'shield', { name: 'Shield', mass: 8, maxHp: 5, char: 'S' });
 ```
 
-### Nowy uklad statku
+### New ship layout
 ```js
 FA.register('shipLayouts', 'enemy_sniper', {
   parts: [
@@ -84,7 +84,7 @@ FA.register('shipLayouts', 'enemy_sniper', {
 });
 ```
 
-### Nowy dzwiek
+### New sound
 ```js
 FA.defineSound('shield_hit', function(actx, dest) {
   var osc = actx.createOscillator();
@@ -97,44 +97,44 @@ FA.defineSound('shield_hit', function(actx, dest) {
 });
 ```
 
-### Nowy wezel narracji
+### New narrative node
 ```js
 FA.register('narrativeText', 'boss_encounter', {
-  text: 'Ogromny statek matka wykryty!',
+  text: 'Massive mothership detected!',
   color: '#f4f'
 });
 ```
 
-## Event bus — kluczowe eventy
+## Event bus — key events
 
-| Event | Payload | Kiedy |
-|-------|---------|-------|
-| `input:action` | `{ action, key }` | Klawisz nacisniety |
-| `entity:damaged` | `{ entity, part, partIndex }` | Czesc statku trafiona |
-| `entity:killed` | `{ entity }` | Statek stracil wszystkie core |
-| `game:over` | `{ victory, score }` | Koniec gry |
-| `state:changed` | `{ key, value, prev }` | Zmiana stanu |
-| `narrative:transition` | `{ from, to, event }` | Zmiana wezla narracji |
+| Event | Payload | When |
+|-------|---------|------|
+| `input:action` | `{ action, key }` | Key pressed |
+| `entity:damaged` | `{ entity, part, partIndex }` | Ship part hit |
+| `entity:killed` | `{ entity }` | Ship lost all cores |
+| `game:over` | `{ victory, score }` | Game ended |
+| `state:changed` | `{ key, value, prev }` | State changed |
+| `narrative:transition` | `{ from, to, event }` | Narrative node changed |
 
 ## Rendering (render.js)
 
-Uzywaj layer system z FA.camera offset:
+Use the layer system with FA.camera offset:
 ```js
 FA.addLayer('myLayer', function() {
   var state = FA.getState();
-  // Przelicz na ekran: screenX = worldX - FA.camera.x
+  // Convert to screen: screenX = worldX - FA.camera.x
   var sx = obj.x - FA.camera.x;
   var sy = obj.y - FA.camera.y;
   FA.draw.circle(sx, sy, 5, '#0ff');
 }, 12);
 ```
 
-Rotacja statku:
+Ship rotation:
 ```js
 ctx.save();
 ctx.translate(screenX, screenY);
 ctx.rotate(ship.angle);
-// Rysuj czesci w koordynatach lokalnych (part.x, part.y)
+// Draw parts in local coordinates (part.x, part.y)
 ctx.restore();
 ```
 
@@ -142,31 +142,31 @@ ctx.restore();
 
 API:
 - `Physics.getMass(parts)` -> `{ mass, cx, cy }`
-- `Physics.applyThrust(ship, part, force)` — ciag + torque
-- `Physics.applyTurn(ship, 'left'|'right', power)` — obroc uzywajac silnikow
-- `Physics.updatePhysics(obj)` — pozycja, predkosc, tarcie
-- `Physics.isConnected(parts, index)` — BFS od core
+- `Physics.applyThrust(ship, part, force)` — thrust + torque
+- `Physics.applyTurn(ship, 'left'|'right', power)` — rotate using engines
+- `Physics.updatePhysics(obj)` — position, velocity, friction
+- `Physics.isConnected(parts, index)` — BFS from core
 - `Physics.worldPartPosition(ship, part)` -> `{ x, y }`
-- `Physics.checkBulletHit(bullet, ship)` -> `{ partIndex }` lub `null`
+- `Physics.checkBulletHit(bullet, ship)` -> `{ partIndex }` or `null`
 
 ## Narrative
 
-Uzywaj `FA.narrative` i `showNarrative()`:
+Use `FA.narrative` and `showNarrative()`:
 ```js
-Ship.showNarrative('first_kill'); // wyswietla tekst + transition
-FA.narrative.setVar('kills', 5, 'Piaty fraг');
+Ship.showNarrative('first_kill'); // displays text + transition
+FA.narrative.setVar('kills', 5, 'Fifth kill');
 ```
 
-## Sprite'y
+## Sprites
 
-Uzyj `create_sprite` i `get_asset_guide` z MCP tools. Integracja:
+Use `create_sprite` and `get_asset_guide` from MCP tools. Integration:
 ```js
 FA.draw.sprite('player', 'core', x - 10, y - 10, 20, 'O', '#f44');
 ```
-Ostatnie 2 argumenty = fallback char i kolor gdy brak sprite'a.
+Last 2 arguments = fallback char and color when sprite is missing.
 
-## Czego unikac
-- Turowy ruch (gra jest real-time!)
-- Skomplikowany crafting/inventory
-- Modyfikowanie plikow ENGINE (fa-*.js)
-- Animacje blokujace game loop
+## What to avoid
+- Turn-based movement (the game is real-time!)
+- Complex crafting/inventory
+- Modifying ENGINE files (fa-*.js)
+- Animations blocking the game loop

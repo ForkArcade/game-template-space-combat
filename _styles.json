@@ -1,0 +1,56 @@
+{
+  "default": "dark-neon",
+  "styles": {
+    "dark-neon": {
+      "name": "Dark Neon",
+      "description": "Glowing neon on deep space black \u2014 cyberpunk HUD feel",
+      "font": {
+        "family": "Orbitron",
+        "url": "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap",
+        "fallback": "monospace"
+      },
+      "palette": {
+        "bg": "#000000",
+        "canvas-bg": "#001122",
+        "text": "#ffffff",
+        "accent": "#ff4444",
+        "accent2": "#44ff44",
+        "ui-border": "#112244"
+      }
+    },
+    "retro-green": {
+      "name": "Retro Terminal",
+      "description": "Phosphor green on black \u2014 classic terminal / Matrix look",
+      "font": {
+        "family": "VT323",
+        "url": "https://fonts.googleapis.com/css2?family=VT323&display=swap",
+        "fallback": "monospace"
+      },
+      "palette": {
+        "bg": "#000000",
+        "canvas-bg": "#001100",
+        "text": "#00ff00",
+        "accent": "#00ff44",
+        "accent2": "#00aa22",
+        "ui-border": "#003300"
+      }
+    },
+    "bright-arcade": {
+      "name": "Bright Arcade",
+      "description": "Colorful retro cabinet feel \u2014 warm and inviting",
+      "font": {
+        "family": "Press Start 2P",
+        "url": "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap",
+        "fallback": "cursive"
+      },
+      "palette": {
+        "bg": "#1a1a2e",
+        "canvas-bg": "#16213e",
+        "text": "#eeeeee",
+        "accent": "#e94560",
+        "accent2": "#ffc107",
+        "ui-border": "#0f3460"
+      }
+    }
+  }
+}

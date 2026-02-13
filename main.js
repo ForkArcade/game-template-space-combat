@@ -21,7 +21,7 @@
   // === INPUT (akcje jednorazowe) ===
   FA.on('input:action', function(data) {
     var state = FA.getState();
-    if (state.screen === 'start' && data.action === 'start') {
+    if (state.screen === 'start' && (data.action === 'start' || data.action === 'shoot')) {
       Ship.beginGame();
       return;
     }

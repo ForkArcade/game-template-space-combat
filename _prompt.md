@@ -118,10 +118,12 @@ FA.register('narrativeText', 'boss_encounter', {
 
 ## Rendering (render.js)
 
-Use the layer system with FA.camera offset:
+Use the layer system with FA.camera offset. **Every layer that accesses game state (ship, enemies, bullets) MUST guard against missing state** — the start screen and game-over screen don't have these properties. An uncaught error in any layer kills the entire game loop permanently.
+
 ```js
 FA.addLayer('myLayer', function() {
   var state = FA.getState();
+  if (state.screen !== 'playing') return;  // REQUIRED — no ship during start/death screen
   // Convert to screen: screenX = worldX - FA.camera.x
   var sx = obj.x - FA.camera.x;
   var sy = obj.y - FA.camera.y;

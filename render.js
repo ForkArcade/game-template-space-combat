@@ -76,7 +76,7 @@
           var def = FA.lookup('partTypes', fp.type);
           var ch = def ? def.char : '?';
           FA.draw.sprite('items', 'floating' + fp.type.charAt(0).toUpperCase() + fp.type.slice(1),
-            -10, -10, 20, ch, '#888');
+            -10, -10, 20, ch, '#888', 0);
           ctx.restore();
         });
       }
@@ -221,7 +221,7 @@
           FA.draw.rect(part.x - 4, part.y + 12, 8, 6 + Math.random() * 8, '#0ff');
           ctx.restore();
         }
-        FA.draw.sprite(category, spriteName, part.x - 10, part.y - 10, 20, ch, color);
+        FA.draw.sprite(category, spriteName, part.x - 10, part.y - 10, 20, ch, color, 0);
       });
 
       // HP bar dla core

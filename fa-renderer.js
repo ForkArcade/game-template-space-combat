@@ -114,10 +114,10 @@
       if (stroke) { _ctx.strokeStyle = stroke; _ctx.lineWidth = lineWidth || 1; _ctx.stroke(); }
     },
 
-    sprite: function(category, name, x, y, size, fallbackChar, fallbackColor) {
+    sprite: function(category, name, x, y, size, fallbackChar, fallbackColor, frame) {
       var sprite = typeof getSprite === 'function' && getSprite(category, name);
       if (sprite) {
-        drawSprite(_ctx, sprite, x, y, size);
+        drawSprite(_ctx, sprite, x, y, size, frame);
       } else if (fallbackChar) {
         _ctx.fillStyle = fallbackColor || '#fff';
         _ctx.font = Math.floor(size * 0.8) + 'px monospace';

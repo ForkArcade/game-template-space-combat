@@ -163,7 +163,7 @@ FA.narrative.setVar('kills', 5, 'Fifth kill');
 
 Use `create_sprite` and `get_asset_guide` from MCP tools. Integration:
 ```js
-FA.draw.sprite('player', 'core', x - 10, y - 10, 20, 'O', '#f44');
+FA.draw.sprite('player', 'core', x - 10, y - 10, 20, 'O', '#f44', 0);
 ```
 Last 2 arguments = fallback char and color when sprite is missing.
 

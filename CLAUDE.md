@@ -89,7 +89,7 @@ score = (kills * 100) + (parts_collected * 25) + (damage_dealt * 2) + floor(surv
 
 ## Sprite fallback
 
-`FA.draw.sprite(category, name, x, y, size, fallbackChar, fallbackColor)` — if sprite is missing, draws text.
+`FA.draw.sprite(category, name, x, y, size, fallbackChar, fallbackColor, frame)` — renders sprite frame, or fallback text when no sprite exists. Frame index selects variant.
 
 ## Coordinate system
 

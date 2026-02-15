@@ -28,7 +28,7 @@ Files copied by the platform (do not edit):
 - **Game loop**: `FA.setUpdate(fn)`, `FA.setRender(fn)`, `FA.start()`, `FA.stop()` — **NOTE: `dt` is in milliseconds** (~16.67ms per tick)
 - **Canvas**: `FA.initCanvas(id, w, h)`, `FA.getCtx()`, `FA.getCanvas()`
 - **Layers**: `FA.addLayer(name, drawFn, order)`, `FA.renderLayers()` — **every gameplay layer MUST start with `if (state.screen !== 'playing') return;`** (start/death screens have no ship; an error in any layer kills the game loop permanently)
-- **Draw**: `FA.draw.clear/rect/strokeRect/text/bar/circle/strokeCircle/sprite/withAlpha/withClip`
+- **Draw**: `FA.draw.clear/rect/strokeRect/text/bar/circle/strokeCircle/sprite/pushAlpha/popAlpha/withAlpha/withClip` — **Use `pushAlpha(alpha)`/`popAlpha()` instead of `withAlpha` in loops** (avoids closure allocation per iteration)
 - **Input**: `FA.bindKey(action, keys)`, `FA.isAction(action)`, `FA.isHeld(action)`, `FA.consumeClick()`, `FA.getMouse()`, `FA.clearInput()`
 - **Audio**: `FA.defineSound(name, fn)`, `FA.playSound(name)` — built-in: hit, pickup, death, step, spell, levelup
 - **Effects**: `FA.addFloat(x, y, text, color, dur)`, `FA.addEffect(obj)`, `FA.updateEffects(dt)`, `FA.updateFloats(dt)`, `FA.drawFloats()`

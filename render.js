@@ -24,9 +24,9 @@
     FA.addLayer('deathScreen', function() {
       var state = FA.getState();
       if (state.screen !== 'death') return;
-      FA.draw.withAlpha(0.7, function() {
-        FA.draw.rect(0, 0, cfg.canvasWidth, cfg.canvasHeight, '#000');
-      });
+      FA.draw.pushAlpha(0.7);
+      FA.draw.rect(0, 0, cfg.canvasWidth, cfg.canvasHeight, '#000');
+      FA.draw.popAlpha();
       FA.draw.text('ZNISZCZONY', cfg.canvasWidth / 2, 200, { color: '#f44', size: 48, bold: true, align: 'center' });
       FA.draw.text('Wynik: ' + state.score, cfg.canvasWidth / 2, 280, { color: '#fff', size: 24, align: 'center' });
       FA.draw.text('Zabici: ' + state.kills + ' | Czesci: ' + state.partsCollected + ' | Obrazenia: ' + state.damageDealt, cfg.canvasWidth / 2, 330, { color: '#aaa', size: 14, align: 'center' });
@@ -69,16 +69,16 @@
         var sy = fp.y - FA.camera.y;
         if (sx < -50 || sx > cfg.canvasWidth + 50 || sy < -50 || sy > cfg.canvasHeight + 50) continue;
         var alpha = FA.clamp(fp.life / 200, 0.2, 0.8);
-        FA.draw.withAlpha(alpha, function() {
-          ctx.save();
-          ctx.translate(sx, sy);
-          ctx.rotate(fp.angle);
-          var def = FA.lookup('partTypes', fp.type);
-          var ch = def ? def.char : '?';
-          FA.draw.sprite('items', 'floating' + fp.type.charAt(0).toUpperCase() + fp.type.slice(1),
-            -10, -10, 20, ch, '#888', 0);
-          ctx.restore();
-        });
+        FA.draw.pushAlpha(alpha);
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(fp.angle);
+        var def = FA.lookup('partTypes', fp.type);
+        var ch = def ? def.char : '?';
+        FA.draw.sprite('items', 'floating' + fp.type.charAt(0).toUpperCase() + fp.type.slice(1),
+          -10, -10, 20, ch, '#888', 0);
+        ctx.restore();
+        FA.draw.popAlpha();
       }
     }, 2);
 
@@ -155,11 +155,11 @@
       if (state.screen !== 'playing') return;
       if (!state.narrativeMessage || state.narrativeMessage.life <= 0) return;
       var alpha = Math.min(1, state.narrativeMessage.life / 1000);
-      FA.draw.withAlpha(alpha, function() {
-        FA.draw.rect(0, 0, cfg.canvasWidth, 40, 'rgba(0,0,0,0.6)');
-        FA.draw.text(state.narrativeMessage.text, cfg.canvasWidth / 2, 12,
-          { color: state.narrativeMessage.color, size: 16, align: 'center' });
-      });
+      FA.draw.pushAlpha(alpha);
+      FA.draw.rect(0, 0, cfg.canvasWidth, 40, 'rgba(0,0,0,0.6)');
+      FA.draw.text(state.narrativeMessage.text, cfg.canvasWidth / 2, 12,
+        { color: state.narrativeMessage.color, size: 16, align: 'center' });
+      FA.draw.popAlpha();
     }, 25);
 
     // === HUD ===
@@ -208,21 +208,21 @@
       var hitFlash = (Date.now() - part.lastHit) < 100;
       if (hitFlash) color = '#fff';
 
-      FA.draw.withAlpha(partAlpha, function() {
-        var category = isPlayer ? 'player' : 'enemies';
-        var spriteName = part.type;
-        // Aktywny silnik
-        if (part.type === 'engine' && ship.activeEngines && ship.activeEngines.has(part)) {
-          spriteName = 'engineActive';
-          // Plomien silnika
-          ctx.save();
-          ctx.shadowColor = '#0ff';
-          ctx.shadowBlur = 10;
-          FA.draw.rect(part.x - 4, part.y + 12, 8, 6 + Math.random() * 8, '#0ff');
-          ctx.restore();
-        }
-        FA.draw.sprite(category, spriteName, part.x - 10, part.y - 10, 20, ch, color, 0);
-      });
+      FA.draw.pushAlpha(partAlpha);
+      var category = isPlayer ? 'player' : 'enemies';
+      var spriteName = part.type;
+      // Aktywny silnik
+      if (part.type === 'engine' && ship.activeEngines && ship.activeEngines.has(part)) {
+        spriteName = 'engineActive';
+        // Plomien silnika
+        ctx.save();
+        ctx.shadowColor = '#0ff';
+        ctx.shadowBlur = 10;
+        FA.draw.rect(part.x - 4, part.y + 12, 8, 6 + Math.random() * 8, '#0ff');
+        ctx.restore();
+      }
+      FA.draw.sprite(category, spriteName, part.x - 10, part.y - 10, 20, ch, color, 0);
+      FA.draw.popAlpha();
 
       // HP bar dla core
       if (part.type === 'core' && part.hp < part.maxHp) {
